@@ -1,26 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
+import { cadastrarUsuario } from "../services/api";
 
-function Cadastro({ usuarios, onCadastrar }) {
+function Cadastro() {
   const [nome, setNome] = useState("");
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
-    if (!nome || !email || !senha) {
-      setErro("Preencha todos os campos.");
-      return;
+    setCarregando(true);
+    try {
+      await cadastrarUsuario({ nome, email, senha });
+      navigate("/login");
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setCarregando(false);
     }
-    if (usuarios.some((u) => u.email === email)) {
-      setErro("Este e-mail já está cadastrado.");
-      return;
-    }
-    onCadastrar({ nome, email, senha });
-    navigate("/login");
   }
 
   return (
@@ -58,8 +59,8 @@ function Cadastro({ usuarios, onCadastrar }) {
             />
           </div>
           {erro && <p className="error-msg">{erro}</p>}
-          <button className="primary-btn" type="submit">
-            Cadastrar
+          <button className="primary-btn" type="submit" disabled={carregando}>
+            {carregando ? "Cadastrando..." : "Cadastrar"}
           </button>
         </form>
         <p className="switch-text">

@@ -1,24 +1,27 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
+import { fazerLogin } from "../services/api";
 
-function Login({ usuarios, onLogin }) {
+function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
+  const [carregando, setCarregando] = useState(false);
   const navigate = useNavigate();
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     setErro("");
-    const usuario = usuarios.find(
-      (u) => u.email === email && u.senha === senha,
-    );
-    if (!usuario) {
-      setErro("E-mail ou senha inválidos.");
-      return;
+    setCarregando(true);
+    try {
+      const usuario = await fazerLogin(email, senha);
+      onLogin(usuario);
+      navigate("/feed");
+    } catch (err) {
+      setErro(err.message);
+    } finally {
+      setCarregando(false);
     }
-    onLogin(usuario);
-    navigate("/feed");
   }
 
   return (
@@ -48,8 +51,8 @@ function Login({ usuarios, onLogin }) {
             />
           </div>
           {erro && <p className="error-msg">{erro}</p>}
-          <button className="primary-btn" type="submit">
-            Entrar
+          <button className="primary-btn" type="submit" disabled={carregando}>
+            {carregando ? "Entrando..." : "Entrar"}
           </button>
         </form>
         <p className="switch-text">
