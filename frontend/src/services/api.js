@@ -1,28 +1,11 @@
-const API_KEY = import.meta.env.VITE_NEWS_API_KEY;
-const BASE_URL = "https://newsapi.org/v2/everything";
-
-const MAPA_CATEGORIAS = {
-  Tecnologia: "technology",
-  Política: "politics",
-  Economia: "business",
-  Esportes: "sports",
-  Ciência: "science",
-  Cultura: "entertainment",
-};
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export async function buscarNoticias(categorias) {
-  const chamadas = categorias.map((cat) => {
-    const termo = MAPA_CATEGORIAS[cat] || cat;
-    return fetch(
-      `${BASE_URL}?q=${encodeURIComponent(termo)}&sortBy=publishedAt&language=en&apiKey=${API_KEY}`,
-    ).then((resp) => {
-      if (!resp.ok) throw new Error("Falha ao carregar notícias.");
-      return resp.json();
-    });
-  });
-
-  const resultados = await Promise.all(chamadas);
-  return resultados.flatMap((r) => r.articles);
+  const resp = await fetch(
+    `${API_URL}/noticias?categorias=${encodeURIComponent(categorias.join(","))}`,
+  );
+  if (!resp.ok) throw new Error("Falha ao carregar notícias.");
+  return resp.json();
 }
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
