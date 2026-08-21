@@ -8,8 +8,6 @@ export async function buscarNoticias(categorias) {
   return resp.json();
 }
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
-
 export async function cadastrarUsuario(dados) {
   const resp = await fetch(`${API_URL}/usuarios`, {
     method: "POST",
