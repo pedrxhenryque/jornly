@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { atualizarUsuario, deletarUsuario } from "../services/api";
 
@@ -12,8 +12,13 @@ function Perfil({ usuarioLogado, onSair }) {
   const [notificacoes, setNotificacoes] = useState(true);
   const [modoEscuro, setModoEscuro] = useState(false);
 
+  useEffect(() => {
+    if (!usuarioLogado) {
+      navigate("/login");
+    }
+  }, [usuarioLogado, navigate]);
+
   if (!usuarioLogado) {
-    navigate("/login");
     return null;
   }
 
