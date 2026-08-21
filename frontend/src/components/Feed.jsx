@@ -7,6 +7,7 @@ function Feed({ usuarioLogado }) {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState("");
   const [busca, setBusca] = useState("");
+  const [categoriaAtiva, setCategoriaAtiva] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -16,7 +17,10 @@ function Feed({ usuarioLogado }) {
     }
     setCarregando(true);
     setErro("");
-    buscarNoticias(usuarioLogado.categorias || ["Tecnologia", "Política"])
+    const categoriasParaBuscar = categoriaAtiva
+      ? [categoriaAtiva]
+      : usuarioLogado.categorias || ["Tecnologia", "Política"];
+    buscarNoticias(categoriasParaBuscar)
       .then(async (lista) => {
         const traduzidas = await Promise.all(
           lista.map(async (n) => ({
@@ -28,7 +32,7 @@ function Feed({ usuarioLogado }) {
       })
       .catch((err) => setErro(err.message))
       .finally(() => setCarregando(false));
-  }, [usuarioLogado, navigate]);
+  }, [usuarioLogado, navigate, categoriaAtiva]);
 
   if (!usuarioLogado) {
     return null;
@@ -49,6 +53,10 @@ function Feed({ usuarioLogado }) {
       n.description?.toLowerCase().includes(busca.toLowerCase()),
   );
 
+  function handleClickCategoria(cat) {
+    setCategoriaAtiva((atual) => (atual === cat ? null : cat));
+  }
+
   return (
     <div className="app">
       <aside className="sidebar">
@@ -65,7 +73,12 @@ function Feed({ usuarioLogado }) {
         <div className="nav-label">Categorias</div>
         <ul className="cat-list">
           {todasCategorias.map((cat) => (
-            <li key={cat} className={categorias.includes(cat) ? "on" : ""}>
+            <li
+              key={cat}
+              className={categoriaAtiva === cat ? "on" : ""}
+              onClick={() => handleClickCategoria(cat)}
+              style={{ cursor: "pointer" }}
+            >
               {cat}
             </li>
           ))}
@@ -90,8 +103,14 @@ function Feed({ usuarioLogado }) {
           />
         </div>
 
-        <h1 className="page-title">Seu feed</h1>
-        <p className="page-sub">Baseado nas categorias selecionadas.</p>
+        <h1 className="page-title">
+          {categoriaAtiva ? categoriaAtiva : "Seu feed"}
+        </h1>
+        <p className="page-sub">
+          {categoriaAtiva
+            ? `Notícias sobre ${categoriaAtiva}.`
+            : "Baseado nas categorias selecionadas."}
+        </p>
 
         {carregando && <p>Carregando notícias...</p>}
 
