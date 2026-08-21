@@ -23,6 +23,11 @@ function App() {
     setUsuarioLogado(null);
   }
 
+  function handleAtualizarUsuario(usuarioAtualizado) {
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuarioAtualizado));
+    setUsuarioLogado(usuarioAtualizado);
+  }
+
   return (
     <BrowserRouter>
       <Routes>
@@ -33,7 +38,13 @@ function App() {
         <Route path="/noticia/:id" element={<Detalhe />} />
         <Route
           path="/perfil"
-          element={<Perfil usuarioLogado={usuarioLogado} onSair={handleSair} />}
+          element={
+            <Perfil
+              usuarioLogado={usuarioLogado}
+              onSair={handleSair}
+              onAtualizarUsuario={handleAtualizarUsuario}
+            />
+          }
         />
       </Routes>
     </BrowserRouter>

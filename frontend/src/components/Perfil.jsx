@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { atualizarUsuario, deletarUsuario } from "../services/api";
 
-function Perfil({ usuarioLogado, onSair }) {
+function Perfil({ usuarioLogado, onSair, onAtualizarUsuario }) {
   const navigate = useNavigate();
   const [nome, setNome] = useState(usuarioLogado?.nome || "");
   const [email, setEmail] = useState(usuarioLogado?.email || "");
@@ -31,7 +31,11 @@ function Perfil({ usuarioLogado, onSair }) {
     setSucesso("");
     setCarregando(true);
     try {
-      await atualizarUsuario(usuarioLogado.id, { nome, email });
+      const usuarioAtualizado = await atualizarUsuario(usuarioLogado.id, {
+        nome,
+        email,
+      });
+      onAtualizarUsuario({ ...usuarioLogado, ...usuarioAtualizado });
       setSucesso("Perfil atualizado com sucesso!");
     } catch (err) {
       setErro(err.message);
